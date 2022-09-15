@@ -274,6 +274,15 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 }
 
 void PlayMode::update(float elapsed) {
+	if(finished) {
+		for(auto &trans : scene.transforms) {
+			if (trans.name == "Red" || trans.name == "Green" || trans.name == "Blue") {
+				trans.rotation = trans.rotation * glm::angleAxis(
+					glm::radians(20 * elapsed),
+					glm::vec3(0.0f, 0.0f, 1.0f));
+			}
+		}
+	}
 	// solutions to movement: whenever press space, round to nearest column
 	if(left.pressed && left.downs == 1) {
 		Scene::Drawable &drawable = scene.drawables.back();
@@ -344,27 +353,29 @@ void PlayMode::update(float elapsed) {
 				finished = true;
 			} 
 			// spawn next coin
-			current_coin += 1;
+			if(!finished) {
+				current_coin += 1;
 
-			scene.transforms.emplace_back();
-			Scene::Transform &trans = scene.transforms.back();
-			trans.position = glm::vec3(-6.0f + 2.4f * col, 0.0f, 10.8f);
-			Scene::Drawable next = Scene::Drawable(&trans);
-			if(current_coin % 6 == 0 || current_coin % 6 == 5) {
-				trans.name = "Red";
-				next.pipeline = red_draw.pipeline;
+				scene.transforms.emplace_back();
+				Scene::Transform &trans = scene.transforms.back();
+				trans.position = glm::vec3(-6.0f + 2.4f * col, 0.0f, 10.8f);
+				Scene::Drawable next = Scene::Drawable(&trans);
+				if(current_coin % 6 == 0 || current_coin % 6 == 5) {
+					trans.name = "Red";
+					next.pipeline = red_draw.pipeline;
+				}
+				else if(current_coin % 6 == 1 || current_coin % 6 == 4) {
+					trans.name = "Green";
+					next.pipeline = green_draw.pipeline;
+				}
+				else {
+					trans.name = "Blue";
+					next.pipeline = blue_draw.pipeline;
+				}
+				scene.drawables.push_back(next);
+				// ensures we only place one coin down at a time
+				space.downs += 1;
 			}
-			else if(current_coin % 6 == 1 || current_coin % 6 == 4) {
-				trans.name = "Green";
-				next.pipeline = green_draw.pipeline;
-			}
-			else {
-				trans.name = "Blue";
-				next.pipeline = blue_draw.pipeline;
-			}
-			scene.drawables.push_back(next);
-			// ensures we only place one coin down at a time
-			space.downs += 1;
 		}
 	}
 
@@ -436,14 +447,14 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 
 		if(drawed && finished) {
 			lines.draw_text("DRAW",
-				glm::vec3(-0.5f, 0.0f, 0.0f),
-				glm::vec3(0.2, 0.0f, 0.0f), glm::vec3(0.0f, 0.2, 0.0f),
+				glm::vec3(-0.4f, -0.1f, 0.0f),
+				glm::vec3(0.4, 0.0f, 0.0f), glm::vec3(0.0f, 0.4, 0.0f),
 				glm::u8vec4(0x00, 0x00, 0x00, 0x00));
 		}
 		else if (finished) {
 			lines.draw_text("WINNER IS " + winner,
-				glm::vec3(-0.5f, 0.0f, 0.0f),
-				glm::vec3(0.2f, 0.0f, 0.0f), glm::vec3(0.0f, 0.2f, 0.0f),
+				glm::vec3(-1.0f, -0.2f, 0.0f),
+				glm::vec3(0.4f, 0.0f, 0.0f), glm::vec3(0.0f, 0.4f, 0.0f),
 				glm::u8vec4(0x00, 0x00, 0x00, 0x00));
 		}
 	}
