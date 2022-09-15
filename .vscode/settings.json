@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "__split_buffer": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "vector": "cpp",
+        "*.tcc": "cpp",
+        "__bit_reference": "cpp",
+        "__string": "cpp",
+        "ios": "cpp",
+        "string": "cpp",
+        "stdexcept": "cpp",
+        "chrono": "cpp",
+        "ostream": "cpp",
+        "__node_handle": "cpp"
+    }
+}
